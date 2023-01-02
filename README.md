@@ -17,6 +17,9 @@ $ uvicorn fasterid:app
 	INFO:     Application startup complete.
 	INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 
+$ curl http:127.0.0.1:8000 -X POST
+{"id":"fmzz7cwc43"}
+
 # Call http://127.0.0.1:8000/docs for API info in a browser
 ```
 
