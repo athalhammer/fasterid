@@ -15,7 +15,7 @@ class ErrorModel(BaseModel):
 
 
 class Settings(BaseSettings):
-    erdi8_seed: int
+    erdi8_stride: int
     erdi8_start: str
     erdi8_safe: bool
     erdi8_filename: str
@@ -46,7 +46,7 @@ async def id_generator():
             raise HTTPException(500, detail="🤷 ran out of identifiers")
         else:
             try:
-                new = e8.increment_fancy(old, settings.erdi8_seed)
+                new = e8.increment_fancy(old, settings.erdi8_stride)
             except Exception as e:
                 raise HTTPException(500, detail=getattr(e, "message", repr(e)))
             f.seek(0)
