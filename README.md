@@ -1,5 +1,5 @@
 # fasterid
-Identifier generator based on FastAPI and erdi8
+Identifier generator based on FastAPI and [`erdi8`](https://github.com/athalhammer/erdi8-py)
 
 
 ## Quick start
