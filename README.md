@@ -49,7 +49,7 @@ $ head ids
 The service accepts also two parameters: `prefix` and `number`. The former is for creating individual identifiers, the second is creating a batch with a certain number of ids. Both parameters are optional and can be configured respecting max batch size and prefix length.
 
 ```
-$ curl -X POST localhost:8000 --data '{"number": 5, "prefix": "https://example.com/"}' -H "content-type: application/json" | jq
+$ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://example.com/"}' -H "content-type: application/json" | jq
     {
      "id": [
         "https://example.com/nvyywq9pnb",
