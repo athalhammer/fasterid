@@ -2,38 +2,50 @@
 
 from pathlib import Path
 from typing import Annotated
-from fastapi import FastAPI, HTTPException, Body
-from pydantic import BaseModel, BaseSettings, Field
+from fastapi import FastAPI, HTTPException, Body, Depends
+from sqlalchemy.orm import Session
+from pydantic import BaseModel, Field
+import models
+import settings
+from database import SessionLocal, engine
+from crud import get_last_erdi8, update_last_erdi8, create_new_prefix
 from erdi8 import Erdi8
 
-class Settings(BaseSettings):
-    erdi8_stride: int
-    erdi8_start: str
-    erdi8_safe: bool
-    fasterid_max_num: int
-    fasterid_max_prefix_len: int
-    fasterid_filename: str
+models.Base.metadata.create_all(bind=engine)
 
-    class Config:
-        env_file = "fasterid.env"
-
-
-settings = Settings()
+settings = settings.Settings()
 e8 = Erdi8(settings.erdi8_safe)
 app = FastAPI()
 
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 Path(settings.fasterid_filename).touch(exist_ok=True)
 
+
 class RequestModel(BaseModel):
-    prefix: str | None  = Field(
-        default="", title="The prefix to be added to the erdi8 string", max_length=settings.fasterid_max_prefix_len
+    prefix: str | None = Field(
+        default="",
+        title="The prefix to be added to the erdi8 string",
+        max_length=settings.fasterid_max_prefix_len,
     )
     number: int | None = Field(
-        default=1, title="The number of identifiers that need to be generated", lt=settings.fasterid_max_num + 1
+        default=1,
+        title="The number of identifiers that need to be generated",
+        lt=settings.fasterid_max_num + 1,
     )
+
 
 class IdModel(BaseModel):
     id: list
+
 
 class ErrorModel(BaseModel):
     detail: str
@@ -42,28 +54,33 @@ class ErrorModel(BaseModel):
 @app.post(
     "/",
     status_code=201,
-    responses={201: {"model": IdModel}, 500: {"model": ErrorModel}}
+    responses={201: {"model": IdModel}, 500: {"model": ErrorModel}},
 )
-async def id_generator(request: Annotated[RequestModel, Body(embed=True)] | None = None):
+async def id_generator(
+    request: Annotated[RequestModel, Body(embed=True)] | None = None,
+    db: Session = Depends(get_db),
+):
     if request is None:
         request = RequestModel()
 
     old = e8.increment_fancy(settings.erdi8_start, settings.erdi8_stride)
-    with open(settings.fasterid_filename, "r+") as f:
-        file_content = f.readline().strip()
-        if file_content != "":
-            old = file_content
+    db_prefix = get_last_erdi8(db, request.prefix)
+    if db_prefix is not None:
+        old = db_prefix.last_erdi8
+    else:
+        db_prefix = create_new_prefix(db, request.prefix, old)
 
-        id_list = []
-        for _ in range(request.number):
-            if old == settings.erdi8_start:
-                raise HTTPException(500, detail="🤷 ran out of identifiers")
-            try:
-                new = e8.increment_fancy(old, settings.erdi8_stride)
-                id_list.append(f"{request.prefix}{new}")
-                old = new
-            except exception as e:
-                raise HTTPException(500, detail=getattr(e, "message", repr(e)))
-        f.seek(0)
-        print(new, file=f)
-        return {"id": id_list}
+    id_list = []
+    for _ in range(request.number):
+        if old == settings.erdi8_start:
+            raise HTTPException(500, detail="🤷 ran out of identifiers")
+        try:
+            new = e8.increment_fancy(old, settings.erdi8_stride)
+            id_list.append(f"{request.prefix}{new}")
+            old = new
+        except exception as e:
+            raise HTTPException(500, detail=getattr(e, "message", repr(e)))
+
+    update_last_erdi8(db, db_prefix, new)
+
+    return {"id": id_list}
