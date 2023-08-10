@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     fasterid_max_num: int
     fasterid_max_prefix_len: int
     fasterid_filename: str
+    sqlalchemy_database_url: str
 
     class Config:
         env_file = "fasterid.env"

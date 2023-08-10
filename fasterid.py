@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 import models
 import settings
 from database import SessionLocal, engine
-from crud import get_last_erdi8, update_last_erdi8, create_new_prefix
+from crud import get_last_erdi8, update_last_erdi8, create_new_prefix, get_mapped_erdi8, create_new_mapped_erdi8
 from erdi8 import Erdi8
 
 models.Base.metadata.create_all(bind=engine)
@@ -40,6 +40,10 @@ class RequestModel(BaseModel):
         default=1,
         title="The number of identifiers that need to be generated",
         lt=settings.fasterid_max_num + 1,
+    )
+    key: list[str] | None = Field(
+        default=[],
+        title="The keys that need to be mapped to identifiers",
     )
 
 
@@ -80,7 +84,23 @@ async def id_generator(
             old = new
         except exception as e:
             raise HTTPException(500, detail=getattr(e, "message", repr(e)))
+        
+    id_map = {}
+    for key in request.key:
+        if old == settings.erdi8_start:
+            raise HTTPException(500, detail="🤷 ran out of identifiers")
+        try:
+            db_erdi8 = get_mapped_erdi8(db, db_prefix, key)
+            if db_erdi8 is None:
+                new = e8.increment_fancy(old, settings.erdi8_stride)
+                id_map[key] = f"{request.prefix}{new}"
+                create_new_mapped_erdi8(db, db_prefix, key, id_map[key])
+                old = new
+            else:
+                id_map[key] = db_erdi8.erdi8
+        except exception as e:
+            raise HTTPException(500, detail=getattr(e, "message", repr(e)))
 
     update_last_erdi8(db, db_prefix, new)
 
-    return {"id": id_list}
+    return {"id": id_list, "map": id_map}
