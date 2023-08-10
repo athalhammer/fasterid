@@ -2,14 +2,17 @@
 
 from pathlib import Path
 from typing import Annotated
-from fastapi import FastAPI, HTTPException, Body, Depends
-from sqlalchemy.orm import Session
+
+from erdi8 import Erdi8
+from fastapi import Body, Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
+
 import models
 import settings
+from crud import (create_new_mapped_erdi8, create_new_prefix, get_last_erdi8,
+                  get_mapped_erdi8, update_last_erdi8)
 from database import SessionLocal, engine
-from crud import get_last_erdi8, update_last_erdi8, create_new_prefix, get_mapped_erdi8, create_new_mapped_erdi8
-from erdi8 import Erdi8
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -84,7 +87,7 @@ async def id_generator(
             old = new
         except exception as e:
             raise HTTPException(500, detail=getattr(e, "message", repr(e)))
-        
+
     id_map = {}
     for key in request.key:
         if old == settings.erdi8_start:
