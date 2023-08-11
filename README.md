@@ -46,7 +46,7 @@ $ head ids
 
 ## Advanced
 
-The service accepts also two parameters: `prefix` and `number`. The former is for creating individual identifiers, the second is creating a batch with a certain number of ids. Both parameters are optional and can be configured respecting max batch size and prefix length.
+The service accepts also three parameters: `prefix`, `number` and `key`. The first parameter is for creating individual identifiers, the second is creating a batch with a certain number of ids. Both parameters are optional and can be configured respecting max batch size and prefix length.
 
 ```
 $ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://example.com/"}' -H "content-type: application/json" | jq
@@ -60,3 +60,19 @@ $ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://ex
      ]
     }
 ```
+
+With the `key` parameter, you can create mapped identifiers, meaning that the service will maintain state and always return the same identifier for the same string.
+
+```
+$ curl -X POST http://127.0.0.1:8000 --data '{"number": 4, "prefix": "https://example.com/", key: ["test"]}' -H "content-type: application/json" | jq
+    {
+     "id": [
+        "https://example.com/nvyywq9pnb",
+        "https://example.com/sgyy435zqc",
+        "https://example.com/x3yx9f2bsd",
+        "https://example.com/bpywgrwnvf"
+     ],
+     "map": {
+        "test": "https://example.com/g9yvp4ryxg"
+     }
+    }

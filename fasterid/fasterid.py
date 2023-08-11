@@ -9,10 +9,10 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from fasterid import models
-from fasterid.settings import get_settings, Settings
-from fasterid.crud import (create_new_mapped_erdi8, create_new_prefix, get_last_erdi8,
-                  get_mapped_erdi8, update_last_erdi8)
+from fasterid.crud import (create_new_mapped_erdi8, create_new_prefix,
+                           get_last_erdi8, get_mapped_erdi8, update_last_erdi8)
 from fasterid.database import SessionLocal, engine
+from fasterid.settings import Settings, get_settings
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -86,7 +86,7 @@ async def id_generator(
             new = e8.increment_fancy(old, settings.erdi8_stride)
             id_list.append(f"{request.prefix}{new}")
             old = new
-        except exception as e:
+        except Exception as e:
             raise HTTPException(500, detail=getattr(e, "message", repr(e)))
 
     if request.key is None:
@@ -106,7 +106,7 @@ async def id_generator(
                 old = new
             else:
                 id_map[key] = db_erdi8.erdi8
-        except exception as e:
+        except Exception as e:
             raise HTTPException(500, detail=getattr(e, "message", repr(e)))
 
     update_last_erdi8(db, db_prefix, new)

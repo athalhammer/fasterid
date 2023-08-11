@@ -5,7 +5,6 @@ from fasterid.database import Base
 # from sqlalchemy.orm import relationship
 
 
-
 class Erdi8(Base):
     __tablename__ = "erdi8s"
 
