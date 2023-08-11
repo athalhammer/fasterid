@@ -13,7 +13,7 @@ $ cat fasterid.env
     FASTERID_MAX_NUM = 50
     FASTERID_MAX_PREFIX_LEN = 100
 
-$ uvicorn fasterid:app
+$ uvicorn fasterid:app --env-file fasterid.env
 	INFO:     Started server process [116821]
 	INFO:     Waiting for application startup.
 	INFO:     Application startup complete.

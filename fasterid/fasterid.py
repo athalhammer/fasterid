@@ -9,13 +9,14 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from fasterid import models
-from fasterid.settings import settings
+from fasterid.settings import get_settings, Settings
 from fasterid.crud import (create_new_mapped_erdi8, create_new_prefix, get_last_erdi8,
                   get_mapped_erdi8, update_last_erdi8)
 from fasterid.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
+settings = get_settings()
 e8 = Erdi8(settings.erdi8_safe)
 app = FastAPI()
 
@@ -63,6 +64,7 @@ class ErrorModel(BaseModel):
     responses={201: {"model": IdModel}, 500: {"model": ErrorModel}},
 )
 async def id_generator(
+    settings: Annotated[Settings, Depends(get_settings)],
     request: Annotated[RequestModel, Body(embed=True)] | None = None,
     db: Session = Depends(get_db),
 ):

@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-from fasterid.settings import settings
+from fasterid.settings import get_settings
 
+settings = get_settings()
 if settings.fasterid_filename is not None:
     database_url = f"sqlite:///./{settings.fasterid_filename}"
 else:
