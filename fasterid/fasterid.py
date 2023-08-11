@@ -8,15 +8,14 @@ from fastapi import Body, Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-import models
-import settings
-from crud import (create_new_mapped_erdi8, create_new_prefix, get_last_erdi8,
+from fasterid import models
+from fasterid.settings import settings
+from fasterid.crud import (create_new_mapped_erdi8, create_new_prefix, get_last_erdi8,
                   get_mapped_erdi8, update_last_erdi8)
-from database import SessionLocal, engine
+from fasterid.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
-settings = settings.Settings()
 e8 = Erdi8(settings.erdi8_safe)
 app = FastAPI()
 

@@ -1,7 +1,7 @@
 from sqlalchemy import insert
 from sqlalchemy.orm import Session
 
-import models
+from fasterid import models
 
 
 def get_mapped_erdi8(db: Session, db_prefix: models.Prefix, key: str):
