@@ -88,6 +88,10 @@ async def id_generator(
         except exception as e:
             raise HTTPException(500, detail=getattr(e, "message", repr(e)))
 
+    if request.key is None:
+        update_last_erdi8(db, db_prefix, new)
+        return {"id": id_list}
+
     id_map = {}
     for key in request.key:
         if old == settings.erdi8_start:
