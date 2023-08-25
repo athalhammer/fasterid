@@ -9,6 +9,7 @@ services:
       - .env
     networks:
       - postgres-network
+    #command: psql -U -CREATE DATABASE [database name];
     volumes:
       - ./db-data/:/var/lib/postgresql/data/
   
@@ -16,7 +17,7 @@ services:
     image: fasterid
     build: ./
     ports:
-      - 15433:80
+      - 15433:8080
     env_file:
       - .env
     depends_on:
