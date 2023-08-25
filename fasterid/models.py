@@ -1,9 +1,8 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
 
-from database import Base
+from fasterid.database import Base
 
 # from sqlalchemy.orm import relationship
-
 
 
 class Erdi8(Base):

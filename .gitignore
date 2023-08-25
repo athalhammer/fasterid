@@ -1,0 +1,6 @@
+*.sqlite
+*.db
+.python_version
+__pycache__
+.python-version
+last-id.txt

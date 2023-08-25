@@ -1,5 +1,8 @@
 erdi8>=0.2.0
-fastapi==0.88.0
+fastapi==0.101.0
 uvicorn==0.20.0
 python-dotenv==0.21.0
 SQLAlchemy==2.0.19
+psycopg2-binary
+pytest==7.4.0
+pydantic-settings==2.0.2
