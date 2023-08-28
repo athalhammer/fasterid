@@ -28,7 +28,7 @@ if settings.use_database:
 )
 async def id_generator(
     settings: Annotated[Settings, Depends(get_settings)],
-    request: Annotated[RequestModel, Body(embed=True)] | None = None,
+    request: RequestModel | None = None,
 ):
     if request is None:
         request = RequestModel()
