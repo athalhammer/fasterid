@@ -20,7 +20,7 @@ $ uvicorn fasterid:app
 	INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 
 $ curl http://127.0.0.1:8000 -X POST
-{"id":["k7zydqrp64"]}
+{"@id": "k7zydqrp64"}
 
 # Call http://127.0.0.1:8000/docs for API info in a browser
 ```
@@ -32,16 +32,16 @@ $ while true; do printf "$(curl -X POST http://127.0.0.1:8000)\n" >> ids; done
 
 # After some seconds stop with: CTRL+C
 $ head ids
-    {"id":["ptzxm3mz85"]}
-    {"id":["tfzwsfhbb6"]}
-    {"id":["y2zvyscnd7"]}
-    {"id":["cnzv657yg8"]}
-    {"id":["h8ztch49j9"]}
-    {"id":["mvzsjtymmb"]}
-    {"id":["rgzrr6txpc"]}
-    {"id":["w3zqxjq8rd"]}
-    {"id":["zpzq4wkktf"]}
-    {"id":["f9zpb8fwwg"]}
+{"@id":"ptzxm3mz85"}
+{"@id":"tfzwsfhbb6"}
+{"@id":"y2zvyscnd7"}
+{"@id":"cnzv657yg8"}
+{"@id":"h8ztch49j9"}
+{"@id":"mvzsjtymmb"}
+{"@id":"rgzrr6txpc"}
+{"@id":"w3zqxjq8rd"}
+{"@id":"zpzq4wkktf"}
+{"@id":"f9zpb8fwwg"}
 ```
 
 ## Advanced
@@ -50,13 +50,22 @@ The service accepts also two parameters: `prefix` and `number`. The former is fo
 
 ```
 $ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://example.com/"}' -H "content-type: application/json" | jq
-    {
-     "id": [
-        "https://example.com/nvyywq9pnb",
-        "https://example.com/sgyy435zqc",
-        "https://example.com/x3yx9f2bsd",
-        "https://example.com/bpywgrwnvf",
-        "https://example.com/g9yvp4ryxg"
-     ]
-    }
+[
+  {
+    "@id": "https://example.com/wswv2sknzy"
+  },
+  {
+    "@id": "https://example.com/bdwt85fz3z"
+  },
+  {
+    "@id": "https://example.com/fzwsfhbb62"
+  },
+  {
+    "@id": "https://example.com/kmwrmv6n83"
+  },
+  {
+    "@id": "https://example.com/q7wqt72yb4"
+  }
+]
+
 ```
