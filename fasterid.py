@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import List
 from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel, BaseSettings, Field
 from erdi8 import Erdi8
@@ -53,7 +53,7 @@ class ErrorModel(BaseModel):
     responses={201: {"model": List[IdModel] | IdModel}, 500: {"model": ErrorModel}},
 )
 async def id_generator(
-    request: Annotated[RequestModel, Body(embed=True)] | None = None
+    request: RequestModel | None = None
 ):
     if request is None:
         request = RequestModel()
