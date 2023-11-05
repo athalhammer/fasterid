@@ -12,6 +12,7 @@ $ cat fasterid.env
     FASTERID_FILENAME = "last-id.txt"
     FASTERID_MAX_NUM = 50
     FASTERID_MAX_PREFIX_LEN = 100
+    FASTERID_ID_PROPERTY = "https://schema.org/identifier"
 
 $ uvicorn fasterid:app
 	INFO:     Started server process [116821]
@@ -46,26 +47,30 @@ $ head ids
 
 ## Advanced
 
-The service accepts also two parameters: `prefix` and `number`. The former is for creating individual identifiers, the second is creating a batch with a certain number of ids. Both parameters are optional and can be configured respecting max batch size and prefix length.
+The service accepts also three parameters: `prefix`, `number`, and `rdf`. The first can be used for creating individual identifiers, the second is creating a batch with a certain number of ids, the third uses the `prefix` to create valid RDF. All parameters are optional but `rdf` depends on `prefix`: the concatenation of `prefix` and the generated erdi8 identifier MUST form a valid absolute IRI. `number` and `prefix` and can be configured respecting max batch size and prefix length.
 
 ```
-$ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://example.com/"}' -H "content-type: application/json" | jq
+$ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://example.com/", "rdf": true}' -H "content-type: application/json" | jq
 [
   {
-    "@id": "https://example.com/wswv2sknzy"
+    "@id": "https://example.com/t7t9vt26f4",
+    "https://schema.org/identifier": "t7t9vt26f4"
   },
   {
-    "@id": "https://example.com/bdwt85fz3z"
+    "@id": "https://example.com/xtt935whh5",
+    "https://schema.org/identifier": "xtt935whh5"
   },
   {
-    "@id": "https://example.com/fzwsfhbb62"
+    "@id": "https://example.com/cft88hrtk6",
+    "https://schema.org/identifier": "cft88hrtk6"
   },
   {
-    "@id": "https://example.com/kmwrmv6n83"
+    "@id": "https://example.com/h2t7fvn5n7",
+    "https://schema.org/identifier": "h2t7fvn5n7"
   },
   {
-    "@id": "https://example.com/q7wqt72yb4"
+    "@id": "https://example.com/mnt6n7hgq8",
+    "https://schema.org/identifier": "mnt6n7hgq8"
   }
 ]
-
 ```
