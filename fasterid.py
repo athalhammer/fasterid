@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-
 from pathlib import Path
 from typing import List
 from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel, BaseSettings, Field
+from rfc3987 import parse
 from erdi8 import Erdi8
 
 
@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     fasterid_max_num: int
     fasterid_max_prefix_len: int
     fasterid_filename: str
+    fasterid_id_property: str
 
     class Config:
         env_file = "fasterid.env"
@@ -21,6 +22,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 e8 = Erdi8(settings.erdi8_safe)
+parse(settings.fasterid_id_property, rule="absolute_IRI")
 app = FastAPI()
 
 Path(settings.fasterid_filename).touch(exist_ok=True)
@@ -37,6 +39,10 @@ class RequestModel(BaseModel):
         title="The number of identifiers that need to be generated",
         lt=settings.fasterid_max_num + 1,
     )
+    rdf: bool | None = Field(
+        default=False,
+        title="Flag if RDF should be returned in JSON-LD format. If true the prefix combined with the identifier needs to form a valid IRI",
+    )
 
 
 class IdModel(BaseModel):
@@ -52,9 +58,7 @@ class ErrorModel(BaseModel):
     status_code=201,
     responses={201: {"model": List[IdModel] | IdModel}, 500: {"model": ErrorModel}},
 )
-async def id_generator(
-    request: RequestModel | None = None
-):
+async def id_generator(request: RequestModel | None = None):
     if request is None:
         request = RequestModel()
 
@@ -70,7 +74,10 @@ async def id_generator(
                 raise HTTPException(500, detail="🤷 ran out of identifiers")
             try:
                 new = e8.increment_fancy(old, settings.erdi8_stride)
-                id_list.append({"@id": f"{request.prefix}{new}"})
+                dic = {"@id": f"{request.prefix}{new}"}
+                if request.rdf and parse(dic["@id"], rule="absolute_IRI"):
+                    dic[settings.fasterid_id_property] = new
+                id_list.append(dic)
                 old = new
             except Exception as e:
                 raise HTTPException(500, detail=getattr(e, "message", repr(e)))
