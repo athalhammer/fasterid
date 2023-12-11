@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List
 from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel, BaseSettings, Field
-from rfc3987 import parse
 from erdi8 import Erdi8
 
 
@@ -22,7 +21,6 @@ class Settings(BaseSettings):
 
 settings = Settings()
 e8 = Erdi8(settings.erdi8_safe)
-parse(settings.fasterid_id_property, rule="absolute_IRI")
 app = FastAPI()
 
 Path(settings.fasterid_filename).touch(exist_ok=True)
@@ -75,7 +73,7 @@ async def id_generator(request: RequestModel | None = None):
             try:
                 new = e8.increment_fancy(old, settings.erdi8_stride)
                 dic = {"@id": f"{request.prefix}{new}"}
-                if request.rdf and parse(dic["@id"], rule="absolute_IRI"):
+                if request.rdf:
                     dic[settings.fasterid_id_property] = new
                 id_list.append(dic)
                 old = new
