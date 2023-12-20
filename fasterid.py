@@ -47,6 +47,7 @@ class RequestModel(BaseModel):
 class IdModel(BaseModel):
     id: str = Field(..., alias="@id")
 
+
 class ErrorModel(BaseModel):
     detail: str
 
