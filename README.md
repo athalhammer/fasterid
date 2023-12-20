@@ -1,6 +1,9 @@
 # fasterid
 Identifier generator based on FastAPI and [`erdi8`](https://github.com/athalhammer/erdi8-py)
 
+## Disclaimer
+
+This software intentionally has no license attached. It does not need to comply to the GPL-3.0 license of `erdi8` as the `erdi8` copyright holder and the author of `fasterid` are the same person. Please get in touch if you plan to use this in a commercial setting.
 
 ## Quick start
 ```
