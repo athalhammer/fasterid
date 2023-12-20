@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+import json
 from pathlib import Path
 from typing import List
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, Response
 from pydantic import BaseModel, BaseSettings, Field
 from erdi8 import Erdi8
 
@@ -46,7 +47,6 @@ class RequestModel(BaseModel):
 class IdModel(BaseModel):
     id: str = Field(..., alias="@id")
 
-
 class ErrorModel(BaseModel):
     detail: str
 
@@ -59,7 +59,7 @@ class ErrorModel(BaseModel):
 async def id_generator(request: RequestModel | None = None):
     if request is None:
         request = RequestModel()
-
+    mime = "application/json"
     old = e8.increment_fancy(settings.erdi8_start, settings.erdi8_stride)
     with open(settings.fasterid_filename, "r+", encoding="ascii") as f:
         file_content = f.readline().strip()
@@ -74,6 +74,7 @@ async def id_generator(request: RequestModel | None = None):
                 new = e8.increment_fancy(old, settings.erdi8_stride)
                 dic = {"@id": f"{request.prefix}{new}"}
                 if request.rdf:
+                    mime = "application/ld+json"
                     dic[settings.fasterid_id_property] = new
                 id_list.append(dic)
                 old = new
@@ -82,5 +83,5 @@ async def id_generator(request: RequestModel | None = None):
         f.seek(0)
         print(new, file=f)
         if len(id_list) == 1:
-            return id_list[0]
-        return id_list
+            return Response(content=json.dumps(id_list[0]), media_type=mime)
+        return Response(content=json.dumps(id_list), media_type=mime)
