@@ -3,10 +3,10 @@
 # Copyright (C) 2023  Andreas Thalhammer
 # Please get in touch if you plan to use this in a commercial setting.
 
-import json
 from pathlib import Path
 from typing import List
 from fastapi import FastAPI, HTTPException, Body, Response
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, BaseSettings, Field
 from erdi8 import Erdi8
 
@@ -30,7 +30,6 @@ app = FastAPI()
 
 Path(settings.fasterid_filename).touch(exist_ok=True)
 
-
 class RequestModel(BaseModel):
     prefix: str | None = Field(
         default="",
@@ -47,20 +46,7 @@ class RequestModel(BaseModel):
         title="Flag if RDF should be returned in JSON-LD format. If true the prefix combined with the identifier needs to form a valid IRI",
     )
 
-
-class IdModel(BaseModel):
-    id: str = Field(..., alias="@id")
-
-
-class ErrorModel(BaseModel):
-    detail: str
-
-
-@app.post(
-    "/",
-    status_code=201,
-    responses={201: {"model": List[IdModel] | IdModel}, 500: {"model": ErrorModel}},
-)
+@app.post("/")
 async def id_generator(request: RequestModel | None = None):
     if request is None:
         request = RequestModel()
@@ -88,5 +74,5 @@ async def id_generator(request: RequestModel | None = None):
         f.seek(0)
         print(new, file=f)
         if len(id_list) == 1:
-            return Response(content=json.dumps(id_list[0]), media_type=mime)
-        return Response(content=json.dumps(id_list), media_type=mime)
+            return JSONResponse(content=id_list[0], media_type=mime, status_code=201)
+        return JSONResponse(content=id_list, media_type=mime, status_code=201)
