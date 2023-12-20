@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+
+# Copyright (C) 2023  Andreas Thalhammer
+# Please get in touch if you plan to use this in a commercial setting.
+
 import json
 from pathlib import Path
 from typing import List
