@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     fasterid_max_prefix_len: int
     fasterid_filename: str
     fasterid_id_property: str
+    fasterid_id_default_prefix: str
 
     class Config:
         env_file = "fasterid.env"
@@ -32,7 +33,7 @@ Path(settings.fasterid_filename).touch(exist_ok=True)
 
 class RequestModel(BaseModel):
     prefix: str | None = Field(
-        default="",
+        default=settings.fasterid_id_default_prefix,
         title="The prefix to be added to the erdi8 string",
         max_length=settings.fasterid_max_prefix_len,
     )

@@ -16,6 +16,7 @@ $ cat fasterid.env
     FASTERID_MAX_NUM = 50
     FASTERID_MAX_PREFIX_LEN = 100
     FASTERID_ID_PROPERTY = "https://schema.org/identifier"
+    FASTERID_ID_DEFAULT_PREFIX = "https://example.org/"
 
 $ uvicorn fasterid:app
 	INFO:     Started server process [116821]
@@ -50,7 +51,7 @@ $ head ids
 
 ## Advanced
 
-The service accepts also three parameters: `prefix`, `number`, and `rdf`. The first can be used for creating individual identifiers, the second is creating a batch with a certain number of ids, the third uses the `prefix` to create valid RDF. All parameters are optional but `rdf` depends on `prefix`: the concatenation of `prefix` and the generated erdi8 identifier MUST form a valid absolute IRI. `number` and `prefix` and can be configured respecting max batch size and prefix length.
+The service accepts also three parameters: `prefix`, `number`, and `rdf`. The first can be used for creating individual identifiers with a prefix, the second is creating a batch with a certain number of ids, the third uses the `prefix` or the `FASTER_ID_DEFAULT_PREFIX` environment setting to create valid RDF. All parameters are optional. For the `rdf = true` settings the generated erdi8 identifier MUST form a valid absolute IRI together with the provided `prefix` or `FASTER_ID_DEFAULT_PREFIX`. `number` and `prefix` and can be configured respecting max batch size and prefix length.
 
 ```
 $ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://example.com/", "rdf": true}' -H "content-type: application/json" | jq
