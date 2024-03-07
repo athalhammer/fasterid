@@ -7,7 +7,8 @@ from pathlib import Path
 from typing import List
 from fastapi import FastAPI, HTTPException, Body, Response
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, BaseSettings, Field
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings
 from erdi8 import Erdi8
 
 
