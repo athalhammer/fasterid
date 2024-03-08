@@ -2,7 +2,7 @@ FROM ubuntu:jammy
 
 EXPOSE 80
 
-ARG FASTER_ID_VERSION="0.1.1"
+ARG FASTER_ID_VERSION="0.1.2"
 
 RUN apt update && apt install wget python3 python3-venv -y
 RUN python3 -m venv /opt/env
