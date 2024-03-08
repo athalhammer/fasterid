@@ -3,6 +3,7 @@
 # Copyright (C) 2023  Andreas Thalhammer
 # Please get in touch if you plan to use this in a commercial setting.
 
+import logging
 from pathlib import Path
 from typing import List
 from fastapi import FastAPI, HTTPException, Body, Response
@@ -11,6 +12,8 @@ from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 from erdi8 import Erdi8
 
+
+logger = logging.getLogger("uvicorn.error")
 
 class Settings(BaseSettings):
     erdi8_stride: int
@@ -24,7 +27,6 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = "fasterid.env"
-
 
 settings = Settings()
 e8 = Erdi8(settings.erdi8_safe)
@@ -75,6 +77,7 @@ async def id_generator(request: RequestModel | None = None):
                 raise HTTPException(500, detail=getattr(e, "message", repr(e)))
         f.seek(0)
         print(new, file=f)
+        logger.info(id_list)
         if len(id_list) == 1:
             return JSONResponse(content=id_list[0], media_type=mime, status_code=201)
         return JSONResponse(content=id_list, media_type=mime, status_code=201)
