@@ -83,5 +83,11 @@ $ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://ex
 
 ```
 docker build -t fasterid .
-docker run -p 80:80 fasterid
+docker run -d -p 80:80 fasterid
+# OR
+docker run -d -p 80:80 -e FASTERID_ID_DEFAULT_PREFIX="" fasterid
+# OR
+docker run --log-driver=awslogs -d -p 80:80 -e FASTERID_ID_DEFAULT_PREFIX="" fasterid
+# OR
+docker run --log-driver=awslogs -d -v /home/ec2-user/latest-id.txt:/fasterid-0.1.2/last-id.txt  -e FASTERID_ID_DEFAULT_PREFIX="" -p 80:80 fasterid
 ````
