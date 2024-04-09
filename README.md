@@ -14,6 +14,7 @@ $ cat fasterid.env
     ERDI8_SAFE = "True"
     FASTERID_FILENAME = "last-id.txt"
     FASTERID_MAX_NUM = 50
+    FASTERID_ALWAYS_RDF = "False"
     FASTERID_MAX_PREFIX_LEN = 100
     FASTERID_ID_PROPERTY = "https://schema.org/identifier"
     FASTERID_ID_DEFAULT_PREFIX = "https://example.org/"
