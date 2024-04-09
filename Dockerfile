@@ -3,7 +3,7 @@ FROM ubuntu:jammy
 EXPOSE 80
 RUN apt update && apt install wget python3 python3-venv -y
 
-ARG FASTER_ID_VERSION="0.1.2"
+ARG FASTER_ID_VERSION="0.1.3"
 RUN wget https://github.com/athalhammer/fasterid/archive/refs/tags/v${FASTER_ID_VERSION}.tar.gz
 RUN tar -xzf v${FASTER_ID_VERSION}.tar.gz
 
