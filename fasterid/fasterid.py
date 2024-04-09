@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     erdi8_start: str
     erdi8_safe: bool
     fasterid_max_num: int
+    fasterid_always_rdf: bool
     fasterid_max_prefix_len: int
     fasterid_filename: str
     fasterid_id_property: str
@@ -68,7 +69,7 @@ async def id_generator(request: RequestModel | None = None):
             try:
                 new = e8.increment_fancy(old, settings.erdi8_stride)
                 dic = {"@id": f"{request.prefix}{new}"}
-                if request.rdf:
+                if request.rdf or settings.fasterid_always_rdf:
                     mime = "application/ld+json"
                     dic[settings.fasterid_id_property] = new
                 id_list.append(dic)
