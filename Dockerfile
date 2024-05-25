@@ -1,7 +1,7 @@
-FROM ubuntu:jammy
+FROM python:3.12-alpine3.19
 
 EXPOSE 80
-RUN apt update && apt install wget python3 python3-venv -y
+RUN apk add wget
 
 ARG FASTER_ID_VERSION="0.1.3"
 RUN wget https://github.com/athalhammer/fasterid/archive/refs/tags/v${FASTER_ID_VERSION}.tar.gz
