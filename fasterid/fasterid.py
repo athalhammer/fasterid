@@ -5,8 +5,8 @@
 
 import logging
 from pathlib import Path
-from typing import List
-from fastapi import FastAPI, HTTPException, Body, Response
+from typing import Annotated
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     fasterid_always_rdf: bool
     fasterid_max_prefix_len: int
     fasterid_filename: str
-    fasterid_id_property: str
-    fasterid_id_default_prefix: str
+    fasterid_property: str
+    fasterid_default_prefix: str
 
     class Config:
         env_file = "fasterid.env"
@@ -37,7 +37,7 @@ Path(settings.fasterid_filename).touch(exist_ok=True)
 
 class RequestModel(BaseModel):
     prefix: str | None = Field(
-        default=settings.fasterid_id_default_prefix,
+        default=settings.fasterid_default_prefix,
         title="The prefix to be added to the erdi8 string",
         max_length=settings.fasterid_max_prefix_len,
     )
@@ -46,13 +46,9 @@ class RequestModel(BaseModel):
         title="The number of identifiers that need to be generated",
         lt=settings.fasterid_max_num + 1,
     )
-    rdf: bool | None = Field(
-        default=False,
-        title="Flag if RDF should be returned in JSON-LD format. If true the prefix combined with the identifier needs to form a valid IRI",
-    )
 
 @app.post("/")
-async def id_generator(request: RequestModel | None = None):
+async def id_generator(request: RequestModel | None = None, accept: Annotated[str | None, Header()] = None):
     if request is None:
         request = RequestModel()
     mime = "application/json"
@@ -69,9 +65,9 @@ async def id_generator(request: RequestModel | None = None):
             try:
                 new = e8.increment_fancy(old, settings.erdi8_stride)
                 dic = {"@id": f"{request.prefix}{new}"}
-                if request.rdf or settings.fasterid_always_rdf:
+                if "ld+json" in accept or settings.fasterid_always_rdf:
                     mime = "application/ld+json"
-                    dic[settings.fasterid_id_property] = new
+                    dic[settings.fasterid_property] = new
                 id_list.append(dic)
                 old = new
             except Exception as e:

@@ -9,15 +9,16 @@ This software intentionally has no license attached. It does not need to comply 
 ```
 $ pip install -r requirements.txt
 $ cat fasterid.env
-    ERDI8_STRIDE = "453459956896834"
-    ERDI8_START = "b222222222"
-    ERDI8_SAFE = "True"
-    FASTERID_FILENAME = "last-id.txt"
-    FASTERID_MAX_NUM = 50
-    FASTERID_ALWAYS_RDF = "False"
-    FASTERID_MAX_PREFIX_LEN = 100
-    FASTERID_ID_PROPERTY = "https://schema.org/identifier"
-    FASTERID_ID_DEFAULT_PREFIX = "https://example.org/"
+  ERDI8_STRIDE = "453459956896834"
+  ERDI8_START = "b222222222"
+  ERDI8_SAFE = True
+  FASTERID_FILENAME = "last-id.txt"
+  FASTERID_PROPERTY = "https://schema.org/identifier"
+  FASTERID_DEFAULT_PREFIX = "https://example.org/"
+  FASTERID_MAX_NUM = 50
+  FASTERID_ALWAYS_RDF = False
+  FASTERID_MAX_PREFIX_LEN = 100
+
 
 $ uvicorn fasterid:app
 	INFO:     Started server process [116821]
@@ -52,10 +53,10 @@ $ head ids
 
 ## Advanced
 
-The service accepts also three parameters: `prefix`, `number`, and `rdf`. The first can be used for creating individual identifiers with a prefix, the second is creating a batch with a certain number of ids, the third uses the `prefix` or the `FASTERID_ID_DEFAULT_PREFIX` environment setting to create valid RDF. All parameters are optional. For the `rdf = true` settings the generated erdi8 identifier MUST form a valid absolute IRI together with the provided `prefix` or `FASTERID_ID_DEFAULT_PREFIX`. `number` and `prefix` and can be configured respecting max batch size and prefix length.
+The service accepts also two optional parameters: `prefix` and `number`. The first can be used for creating individual identifiers with a prefix, the second is creating a batch with a certain number of ids. If `application/ld+json` is provided in the accept header the `prefix` or the `FASTERID_ID_DEFAULT_PREFIX` environment setting to create valid RDF. In that case, the generated erdi8 identifier MUST form a valid absolute IRI together with the provided `prefix` or `FASTERID_ID_DEFAULT_PREFIX`. The `number` and `prefix` parameters can be configured respecting max batch size and prefix length.
 
 ```
-$ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://example.com/", "rdf": true}' -H "content-type: application/json" | jq
+$ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://example.com/"}' -H "content-type: application/json" -H "accept: application/ld+json" | jq
 [
   {
     "@id": "https://example.com/t7t9vt26f4",
