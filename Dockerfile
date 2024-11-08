@@ -3,7 +3,7 @@ FROM python:3.12-alpine
 EXPOSE 80
 RUN apk add wget
 
-ARG FASTER_ID_VERSION="0.1.4"
+ARG FASTER_ID_VERSION="0.1.3"
 RUN wget https://github.com/athalhammer/fasterid/archive/refs/tags/v${FASTER_ID_VERSION}.tar.gz
 RUN tar -xzf v${FASTER_ID_VERSION}.tar.gz
 
