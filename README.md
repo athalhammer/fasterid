@@ -56,7 +56,9 @@ $ head ids
 The service accepts also two optional parameters: `prefix` and `number`. The first can be used for creating individual identifiers with a prefix, the second is creating a batch with a certain number of ids. If `application/ld+json` is provided in the accept header the `prefix` or the `FASTERID_ID_DEFAULT_PREFIX` environment setting to create valid RDF. In that case, the generated erdi8 identifier MUST form a valid absolute IRI together with the provided `prefix` or `FASTERID_ID_DEFAULT_PREFIX`. The `number` and `prefix` parameters can be configured respecting max batch size and prefix length.
 
 ```
-$ curl -X POST http://127.0.0.1:8000 --data '{"number": 5, "prefix": "https://example.com/"}' -H "content-type: application/json" -H "accept: application/ld+json" | jq
+$ curl -X POST http://127.0.0.1:8000 \
+  --data '{"number": 5, "prefix": "https://example.com/"}' \
+  -H "content-type: application/json" -H "accept: application/ld+json" | jq
 [
   {
     "@id": "https://example.com/t7t9vt26f4",
