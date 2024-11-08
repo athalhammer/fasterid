@@ -1,3 +1,6 @@
+# Copyright (C) 2023  Andreas Thalhammer
+# Please get in touch if you plan to use this in a commercial setting.
+
 FROM python:3.12-alpine
 
 EXPOSE 80
