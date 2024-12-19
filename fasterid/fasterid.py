@@ -15,6 +15,7 @@ from erdi8 import Erdi8
 
 logger = logging.getLogger("uvicorn.error")
 
+
 class Settings(BaseSettings):
     erdi8_stride: int
     erdi8_start: str
@@ -29,11 +30,13 @@ class Settings(BaseSettings):
     class Config:
         env_file = "fasterid.env"
 
+
 settings = Settings()
 e8 = Erdi8(settings.erdi8_safe)
 app = FastAPI()
 
 Path(settings.fasterid_filename).touch(exist_ok=True)
+
 
 class RequestModel(BaseModel):
     prefix: str | None = Field(
@@ -47,8 +50,27 @@ class RequestModel(BaseModel):
         lt=settings.fasterid_max_num + 1,
     )
 
-@app.post("/")
-async def id_generator(request: RequestModel | None = None, accept: Annotated[str | None, Header()] = None):
+
+@app.post(
+    "/",
+    responses={
+        201: {
+            "description": "Generated identifiers",
+            "content": {
+                "application/json": {"example": {"@id": "erdi8"}},
+                "application/ld+json": {
+                    "example": {
+                        "@id": "https://example.com/erdi8",
+                        "https://schema.org/identifier": "erdi8",
+                    }
+                },
+            },
+        }
+    },
+)
+async def id_generator(
+    request: RequestModel | None = None, accept: Annotated[str | None, Header()] = None
+):
     if request is None:
         request = RequestModel()
     mime = "application/json"
