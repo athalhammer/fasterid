@@ -2,6 +2,8 @@
 
 # Copyright (C) 2023  Andreas Thalhammer
 # Please get in touch if you plan to use this in a commercial setting.
+from .store import LatestOnlyIdentifierStore, FullLogIdentifierStore
+from .settings import Settings, StorageType
 
 import logging
 from pathlib import Path
@@ -9,27 +11,10 @@ from typing import Annotated
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings
 from erdi8 import Erdi8
 
 
 logger = logging.getLogger("uvicorn.error")
-
-
-class Settings(BaseSettings):
-    erdi8_stride: int
-    erdi8_start: str
-    erdi8_safe: bool
-    fasterid_max_num: int
-    fasterid_always_rdf: bool
-    fasterid_max_prefix_len: int
-    fasterid_filename: str
-    fasterid_property: str
-    fasterid_default_prefix: str
-
-    class Config:
-        env_file = "fasterid.env"
-
 
 settings = Settings()
 e8 = Erdi8(settings.erdi8_safe)
@@ -49,6 +34,12 @@ class RequestModel(BaseModel):
         title="The number of identifiers that need to be generated",
         lt=settings.fasterid_max_num + 1,
     )
+
+
+if settings.fasterid_store == StorageType.FILE_LOG:
+    identifier_store = FullLogIdentifierStore(settings.fasterid_filename)
+else:
+    identifier_store = LatestOnlyIdentifierStore(settings.fasterid_filename)
 
 
 @app.post(
@@ -74,29 +65,29 @@ async def id_generator(
     if request is None:
         request = RequestModel()
     mime = "application/json"
-    old = e8.increment_fancy(settings.erdi8_start, settings.erdi8_stride)
-    with open(settings.fasterid_filename, "r+", encoding="ascii") as f:
-        file_content = f.readline().strip()
-        if file_content != "":
-            old = file_content
 
-        id_list = []
-        for _ in range(request.number):
-            if old == settings.erdi8_start:
-                raise HTTPException(500, detail="🤷 ran out of identifiers")
-            try:
-                new = e8.increment_fancy(old, settings.erdi8_stride)
-                dic = {"@id": f"{request.prefix}{new}"}
-                if "ld+json" in accept or settings.fasterid_always_rdf:
-                    mime = "application/ld+json"
-                    dic[settings.fasterid_property] = new
-                id_list.append(dic)
-                old = new
-            except Exception as e:
-                raise HTTPException(500, detail=getattr(e, "message", repr(e)))
-        f.seek(0)
-        print(new, file=f)
-        logger.info(id_list)
-        if len(id_list) == 1:
-            return JSONResponse(content=id_list[0], media_type=mime, status_code=201)
-        return JSONResponse(content=id_list, media_type=mime, status_code=201)
+    old = identifier_store.get_last_identifier()
+    if not old:
+        old = e8.increment_fancy(settings.erdi8_start, settings.erdi8_stride)
+
+    id_list = []
+    for _ in range(request.number):
+        if old == settings.erdi8_start:
+            raise HTTPException(500, detail="🤷 ran out of identifiers")
+        try:
+            new = e8.increment_fancy(old, settings.erdi8_stride)
+            dic = {"@id": f"{request.prefix}{new}"}
+            if "ld+json" in accept or settings.fasterid_always_rdf:
+                mime = "application/ld+json"
+                dic[settings.fasterid_property] = new
+            id_list.append(dic)
+            old = new
+        except Exception as e:
+            raise HTTPException(500, detail=getattr(e, "message", repr(e)))
+
+    for dic in id_list:
+        identifier_store.store_identifier(dic["@id"].split("/")[-1])
+    logger.info(id_list)
+    if len(id_list) == 1:
+        return JSONResponse(content=id_list[0], media_type=mime, status_code=201)
+    return JSONResponse(content=id_list, media_type=mime, status_code=201)
