@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 class StorageType(Enum):
     FILE_LOG = "file-log"
     FILE = "file-latest"
+    DATABASE = "database"
 
 
 class Settings(BaseSettings):

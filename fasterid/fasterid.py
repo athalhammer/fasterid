@@ -2,7 +2,7 @@
 
 # Copyright (C) 2023  Andreas Thalhammer
 # Please get in touch if you plan to use this in a commercial setting.
-from .store import LatestOnlyIdentifierStore, FullLogIdentifierStore
+from .store import LatestOnlyIdentifierStore, FullLogIdentifierStore, DatabaseIdentifierStore
 from .settings import Settings, StorageType
 
 import logging
@@ -35,8 +35,10 @@ class RequestModel(BaseModel):
         lt=settings.fasterid_max_num + 1,
     )
 
-
-if settings.fasterid_store == StorageType.FILE_LOG:
+if settings.fasterid_store == StorageType.DATABASE:
+    # TODO : remove the hardcoded sqlite:///
+    identifier_store = DatabaseIdentifierStore("sqlite:///" + settings.fasterid_filename)
+elif settings.fasterid_store == StorageType.FILE_LOG:
     identifier_store = FullLogIdentifierStore(settings.fasterid_filename)
 else:
     identifier_store = LatestOnlyIdentifierStore(settings.fasterid_filename)
