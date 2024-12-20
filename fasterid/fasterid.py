@@ -6,7 +6,6 @@ from .store import LatestOnlyIdentifierStore, FullLogIdentifierStore, DatabaseId
 from .settings import Settings, StorageType
 
 import logging
-from pathlib import Path
 from typing import Annotated
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.responses import JSONResponse
@@ -19,8 +18,6 @@ logger = logging.getLogger("uvicorn.error")
 settings = Settings()
 e8 = Erdi8(settings.erdi8_safe)
 app = FastAPI()
-
-Path(settings.fasterid_filename).touch(exist_ok=True)
 
 
 class RequestModel(BaseModel):
@@ -35,13 +32,12 @@ class RequestModel(BaseModel):
         lt=settings.fasterid_max_num + 1,
     )
 
-if settings.fasterid_store == StorageType.DATABASE:
-    # TODO : remove the hardcoded sqlite:///
-    identifier_store = DatabaseIdentifierStore("sqlite:///" + settings.fasterid_filename)
-elif settings.fasterid_store == StorageType.FILE_LOG:
-    identifier_store = FullLogIdentifierStore(settings.fasterid_filename)
+if settings.fasterid_store_type == StorageType.DATABASE:
+    identifier_store = DatabaseIdentifierStore(settings.fasterid_store_loc)
+elif settings.fasterid_store_type == StorageType.FILE_LOG:
+    identifier_store = FullLogIdentifierStore(settings.fasterid_store_loc)
 else:
-    identifier_store = LatestOnlyIdentifierStore(settings.fasterid_filename)
+    identifier_store = LatestOnlyIdentifierStore(settings.fasterid_store_loc)
 
 
 @app.post(

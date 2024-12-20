@@ -1,6 +1,6 @@
 import os
 from abc import ABC, abstractmethod
-from sqlalchemy import Column, String, Integer, DateTime
+from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -32,7 +32,7 @@ class DatabaseIdentifierStore(IdentifierStore):
     def get_last_identifier(self) -> str:
         session = self.Session()
         try:
-            last_entry = session.query(IdentifierLog).order_by(IdentifierLog.id.desc()).first()
+            last_entry = session.query(IdentifierLog).order_by(IdentifierLog.timestamp.desc()).first()
             return last_entry.identifier if last_entry else ""
         finally:
             session.close()
@@ -40,7 +40,7 @@ class DatabaseIdentifierStore(IdentifierStore):
     def store_identifier(self, identifier: str):
         session = self.Session()
         try:
-            log_entry = IdentifierLog(identifier=identifier, timestamp=datetime.utcnow().isoformat())
+            log_entry = IdentifierLog(identifier=identifier, timestamp=datetime.utcnow())
             session.add(log_entry)
             session.commit()
         finally:

@@ -15,10 +15,10 @@ class Settings(BaseSettings):
     fasterid_max_num: int
     fasterid_always_rdf: bool
     fasterid_max_prefix_len: int
-    fasterid_filename: str
     fasterid_property: str
     fasterid_default_prefix: str
-    fasterid_store: StorageType = StorageType.FILE_LOG
+    fasterid_store_type: StorageType = StorageType.FILE_LOG
+    fasterid_store_loc: str
 
     class Config:
         env_file = "fasterid.env"

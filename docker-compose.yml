@@ -1,0 +1,26 @@
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: yourdatabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: ["./wait-for-it.sh", "db:5432", "--", "uvicorn", "fasterid:app", "--host", "0.0.0.0", "--port", "80"]
+    volumes:
+      - .:/app
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    environment:
+      FASTERID_STORE_LOC: postgresql://youruser:yourpassword@db/yourdatabase
+      FASTERID_STORE_TYPE: database
+
+volumes:
+  postgres_data:
