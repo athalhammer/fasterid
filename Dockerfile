@@ -1,10 +1,9 @@
 # Copyright (C) 2023  Andreas Thalhammer
 # Please get in touch if you plan to use this in a commercial setting.
-
-FROM python:3.12-slim
+FROM python:3.12-alpine
 
 # uncomment below for postgresql
-#RUN apt update && apt install -y libpq-dev && rm -rf /var/lib/apt/lists/*
+#RUN apk update && apk add --no-cache postgresql-dev
 
 EXPOSE 80
 
