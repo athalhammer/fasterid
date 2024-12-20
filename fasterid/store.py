@@ -10,8 +10,7 @@ Base = declarative_base()
 
 class IdentifierLog(Base):
     __tablename__ = 'identifier_log'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    identifier = Column(String, nullable=False)
+    identifier = Column(String, primary_key=True)
     timestamp = Column(DateTime, nullable=False)
 
 class IdentifierStore(ABC):
