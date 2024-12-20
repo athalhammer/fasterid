@@ -53,13 +53,13 @@ class LatestOnlyIdentifierStore(IdentifierStore):
 
     def get_last_identifier(self) -> str:
         try:
-            with open(self.filename, "r", encoding="ascii") as f:
+            with open(self.filename, "r") as f:
                 return f.readline().strip().split(",")[0]
         except FileNotFoundError:
             return ""
 
     def store_identifier(self, identifier: str):
-        with open(self.filename, "w", encoding="ascii") as f:
+        with open(self.filename, "w") as f:
             f.write(f"{identifier},{datetime.utcnow().isoformat()}\n")
 
 
@@ -69,7 +69,7 @@ class FullLogIdentifierStore(IdentifierStore):
 
     def get_last_identifier(self) -> str:
         try:
-            with open(self.filename, "r", encoding="ascii") as f:
+            with open(self.filename, "r") as f:
                 f.seek(0, os.SEEK_END)
                 file_size = f.tell()
                 buffer = bytearray()
@@ -85,5 +85,5 @@ class FullLogIdentifierStore(IdentifierStore):
             return ""
 
     def store_identifier(self, identifier: str):
-        with open(self.filename, "a", encoding="ascii") as f:
+        with open(self.filename, "a") as f:
             f.write(f"{identifier},{datetime.utcnow().isoformat()}\n")
