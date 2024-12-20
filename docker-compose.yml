@@ -1,7 +1,7 @@
 
 services:
   db:
-    image: postgres:13
+    image: postgres:17
     environment:
       POSTGRES_USER: youruser
       POSTGRES_PASSWORD: yourpassword
