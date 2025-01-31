@@ -84,7 +84,11 @@ async def id_generator(
             raise HTTPException(500, detail=getattr(e, "message", repr(e)))
 
     for dic in id_list:
-        identifier_store.store_identifier(dic["@id"].split("/")[-1])
+        ts = identifier_store.store_identifier(dic["@id"].split("/")[-1])
+        prop = "timestamp"
+        if "ld+json" in accept or settings.fasterid_always_rdf:
+            prop = "https://schema.org/dateCreated"
+        dic[prop] = ts.isoformat()
     logger.info(id_list)
     if len(id_list) == 1:
         return JSONResponse(content=id_list[0], media_type=mime, status_code=201)

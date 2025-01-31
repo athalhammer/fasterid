@@ -19,7 +19,7 @@ class IdentifierStore(ABC):
         pass
 
     @abstractmethod
-    def store_identifier(self, identifier: str):
+    def store_identifier(self, identifier: str) -> datetime:
         pass
 
 
@@ -37,12 +37,14 @@ class DatabaseIdentifierStore(IdentifierStore):
         finally:
             session.close()
 
-    def store_identifier(self, identifier: str):
+    def store_identifier(self, identifier: str) -> datetime:
         session = self.Session()
         try:
-            log_entry = IdentifierLog(identifier=identifier, timestamp=datetime.utcnow())
+            ts = datetime.utcnow()
+            log_entry = IdentifierLog(identifier=identifier, timestamp=ts)
             session.add(log_entry)
             session.commit()
+            return ts
         finally:
             session.close()
 
@@ -58,9 +60,11 @@ class LatestOnlyIdentifierStore(IdentifierStore):
         except FileNotFoundError:
             return ""
 
-    def store_identifier(self, identifier: str):
+    def store_identifier(self, identifier: str) -> datetime:
+        ts = datetime.utcnow()
         with open(self.filename, "w") as f:
-            f.write(f"{identifier},{datetime.utcnow().isoformat()}\n")
+            f.write(f"{identifier},{ts.isoformat()}\n")
+        return ts
 
 
 class FullLogIdentifierStore(IdentifierStore):
@@ -84,6 +88,7 @@ class FullLogIdentifierStore(IdentifierStore):
         except FileNotFoundError:
             return ""
 
-    def store_identifier(self, identifier: str):
+    def store_identifier(self, identifier: str) -> datetime:
+        ts = datetime.utcnow()
         with open(self.filename, "a") as f:
-            f.write(f"{identifier},{datetime.utcnow().isoformat()}\n")
+            f.write(f"{identifier},{ts.isoformat()}\n")

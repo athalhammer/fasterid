@@ -3,7 +3,7 @@
 FROM python:3.12-alpine
 
 # uncomment below for postgresql
-# RUN apk update && apk add --no-cache bash postgresql-dev
+RUN apk update && apk add --no-cache bash postgresql-dev
 
 EXPOSE 80
 
