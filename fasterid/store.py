@@ -92,3 +92,4 @@ class FullLogIdentifierStore(IdentifierStore):
         ts = datetime.utcnow()
         with open(self.filename, "a") as f:
             f.write(f"{identifier},{ts.isoformat()}\n")
+        return ts
