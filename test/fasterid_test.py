@@ -37,4 +37,4 @@ def test_json_ld():
     )
     assert response.status_code == 201
     g = Graph().parse(data=response.content, format="json-ld")
-    assert len(g) == 5
+    assert len(g) == 10

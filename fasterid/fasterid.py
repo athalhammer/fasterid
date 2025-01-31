@@ -77,7 +77,7 @@ async def id_generator(
             dic = {"@id": f"{request.prefix}{new}"}
             if "ld+json" in accept or settings.fasterid_always_rdf:
                 mime = "application/ld+json"
-                dic[settings.fasterid_property] = new
+                dic[settings.fasterid_id_property] = new
             id_list.append(dic)
             old = new
         except Exception as e:
@@ -87,7 +87,7 @@ async def id_generator(
         ts = identifier_store.store_identifier(dic["@id"].split("/")[-1])
         prop = "timestamp"
         if "ld+json" in accept or settings.fasterid_always_rdf:
-            prop = "https://schema.org/dateCreated"
+            prop = settings.fasterid_ts_property
         dic[prop] = ts.isoformat()
     logger.info(id_list)
     if len(id_list) == 1:
