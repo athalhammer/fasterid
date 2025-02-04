@@ -2,10 +2,15 @@
 
 # Copyright (C) 2023  Andreas Thalhammer
 # Please get in touch if you plan to use this in a commercial setting.
-from .store import LatestOnlyIdentifierStore, FullLogIdentifierStore, DatabaseIdentifierStore
+from .store import (
+    LatestOnlyIdentifierStore,
+    FullLogIdentifierStore,
+    DatabaseIdentifierStore,
+)
 from .settings import Settings, StorageType
 
 import logging
+from datetime import datetime
 from typing import Annotated
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.responses import JSONResponse
@@ -32,6 +37,7 @@ class RequestModel(BaseModel):
         lt=settings.fasterid_max_num + 1,
     )
 
+
 if settings.fasterid_store_type == StorageType.DATABASE:
     identifier_store = DatabaseIdentifierStore(settings.fasterid_store_loc)
 elif settings.fasterid_store_type == StorageType.FILE_LOG:
@@ -46,11 +52,17 @@ else:
         201: {
             "description": "Generated identifiers",
             "content": {
-                "application/json": {"example": {"@id": "erdi8"}},
+                "application/json": {
+                    "example": {
+                        "@id": "erdi8",
+                        "timestamp": "2023-01-01T00:00:00.000000",
+                    }
+                },
                 "application/ld+json": {
                     "example": {
                         "@id": "https://example.com/erdi8",
                         "https://schema.org/identifier": "erdi8",
+                        "https://schema.org/dateCreated": "2023-01-01T00:00:00.000000",
                     }
                 },
             },
@@ -62,21 +74,24 @@ async def id_generator(
 ):
     if request is None:
         request = RequestModel()
-    mime = "application/json"
 
     old = identifier_store.get_last_identifier()
     if not old:
         old = e8.increment_fancy(settings.erdi8_start, settings.erdi8_stride)
 
     id_list = []
+    is_ld_json = "ld+json" in accept or settings.fasterid_always_rdf
+    mime = "application/ld+json" if is_ld_json else "application/json"
+    ts_prop = settings.fasterid_ts_property if is_ld_json else "timestamp"
+
     for _ in range(request.number):
         if old == settings.erdi8_start:
             raise HTTPException(500, detail="🤷 ran out of identifiers")
         try:
             new = e8.increment_fancy(old, settings.erdi8_stride)
-            dic = {"@id": f"{request.prefix}{new}"}
-            if "ld+json" in accept or settings.fasterid_always_rdf:
-                mime = "application/ld+json"
+            ts = datetime.utcnow()
+            dic = {"@id": f"{request.prefix}{new}", ts_prop: ts.isoformat()}
+            if is_ld_json:
                 dic[settings.fasterid_id_property] = new
             id_list.append(dic)
             old = new
@@ -84,11 +99,10 @@ async def id_generator(
             raise HTTPException(500, detail=getattr(e, "message", repr(e)))
 
     for dic in id_list:
-        ts = identifier_store.store_identifier(dic["@id"].split("/")[-1])
-        prop = "timestamp"
-        if "ld+json" in accept or settings.fasterid_always_rdf:
-            prop = settings.fasterid_ts_property
-        dic[prop] = ts.isoformat()
+        identifier_store.store_identifier(
+            dic["@id"].split("/")[-1], datetime.fromisoformat(dic[ts_prop])
+        )
+
     logger.info(id_list)
     if len(id_list) == 1:
         return JSONResponse(content=id_list[0], media_type=mime, status_code=201)

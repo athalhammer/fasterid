@@ -19,7 +19,7 @@ class IdentifierStore(ABC):
         pass
 
     @abstractmethod
-    def store_identifier(self, identifier: str) -> datetime:
+    def store_identifier(self, identifier: str, ts: datetime):
         pass
 
 
@@ -37,14 +37,12 @@ class DatabaseIdentifierStore(IdentifierStore):
         finally:
             session.close()
 
-    def store_identifier(self, identifier: str) -> datetime:
+    def store_identifier(self, identifier: str, ts: datetime):
         session = self.Session()
         try:
-            ts = datetime.utcnow()
             log_entry = IdentifierLog(identifier=identifier, timestamp=ts)
             session.add(log_entry)
             session.commit()
-            return ts
         finally:
             session.close()
 
@@ -60,11 +58,9 @@ class LatestOnlyIdentifierStore(IdentifierStore):
         except FileNotFoundError:
             return ""
 
-    def store_identifier(self, identifier: str) -> datetime:
-        ts = datetime.utcnow()
+    def store_identifier(self, identifier: str, ts: datetime):
         with open(self.filename, "w") as f:
             f.write(f"{identifier},{ts.isoformat()}\n")
-        return ts
 
 
 class FullLogIdentifierStore(IdentifierStore):
@@ -88,8 +84,6 @@ class FullLogIdentifierStore(IdentifierStore):
         except FileNotFoundError:
             return ""
 
-    def store_identifier(self, identifier: str) -> datetime:
-        ts = datetime.utcnow()
+    def store_identifier(self, identifier: str, ts: datetime):
         with open(self.filename, "a") as f:
             f.write(f"{identifier},{ts.isoformat()}\n")
-        return ts
