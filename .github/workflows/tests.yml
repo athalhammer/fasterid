@@ -16,5 +16,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install -r requirements_dev.txt
       - run: pip install -r requirements.txt
+      - run: cp template.env .env
       - run: pytest
 
