@@ -20,7 +20,7 @@ $ uvicorn fasterid:app
 	INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 
 $ curl http://127.0.0.1:8000 -X POST
-{"@id":"https://example.org/k7zydqrp64","timestamp":"1970-01-01T00:00:00.000001"}
+{"@id":"k7zydqrp64","timestamp":"1970-01-01T00:00:00.000001"}
 
 # Call http://127.0.0.1:8000/docs for API info in a browser
 ```
@@ -32,16 +32,16 @@ $ while true; do printf "$(curl -X POST http://127.0.0.1:8000)\n" >> ids; done
 
 # After some seconds stop with: CTRL+C
 $ head ids
-{"@id":"https://example.org/ptzxm3mz85","timestamp":"1970-01-01T00:00:00.301453"}
-{"@id":"https://example.org/tfzwsfhbb6","timestamp":"1970-01-01T00:00:00.317324"}
-{"@id":"https://example.org/y2zvyscnd7","timestamp":"1970-01-01T00:00:00.333308"}
-{"@id":"https://example.org/cnzv657yg8","timestamp":"1970-01-01T00:00:00.348514"}
-{"@id":"https://example.org/h8ztch49j9","timestamp":"1970-01-01T00:00:00.365080"}
-{"@id":"https://example.org/mvzsjtymmb","timestamp":"1970-01-01T00:00:00.381241"}
-{"@id":"https://example.org/rgzrr6txpc","timestamp":"1970-01-01T00:00:00.395853"}
-{"@id":"https://example.org/w3zqxjq8rd","timestamp":"1970-01-01T00:00:00.410346"}
-{"@id":"https://example.org/zpzq4wkktf","timestamp":"1970-01-01T00:00:00.428683"}
-{"@id":"https://example.org/f9zpb8fwwg","timestamp":"1970-01-01T00:00:00.455372"}
+{"@id":"ptzxm3mz85","timestamp":"1970-01-01T00:00:00.301453"}
+{"@id":"tfzwsfhbb6","timestamp":"1970-01-01T00:00:00.317324"}
+{"@id":"y2zvyscnd7","timestamp":"1970-01-01T00:00:00.333308"}
+{"@id":"cnzv657yg8","timestamp":"1970-01-01T00:00:00.348514"}
+{"@id":"h8ztch49j9","timestamp":"1970-01-01T00:00:00.365080"}
+{"@id":"mvzsjtymmb","timestamp":"1970-01-01T00:00:00.381241"}
+{"@id":"rgzrr6txpc","timestamp":"1970-01-01T00:00:00.395853"}
+{"@id":"w3zqxjq8rd","timestamp":"1970-01-01T00:00:00.410346"}
+{"@id":"zpzq4wkktf","timestamp":"1970-01-01T00:00:00.428683"}
+{"@id":"f9zpb8fwwg","timestamp":"1970-01-01T00:00:00.455372"}
 
 ```
 

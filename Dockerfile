@@ -9,9 +9,8 @@ EXPOSE 80
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-RUN mv template.env .env
+RUN pip install --no-cache-dir -r requirements.txt
+RUN cp template.env .env
 
 CMD ["uvicorn", "fasterid:app", "--host", "0.0.0.0", "--port", "80"]

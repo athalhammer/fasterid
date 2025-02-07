@@ -91,8 +91,9 @@ async def id_generator(
         try:
             new = e8.increment_fancy(old, settings.erdi8_stride)
             ts = datetime.utcnow()
-            dic = {"@id": f"{request.prefix}{new}", ts_prop: ts.isoformat()}
+            dic = {"@id": f"{new}", ts_prop: ts.isoformat()}
             if is_ld_json:
+                dic["@id"] = f"{request.prefix}{new}"
                 dic[settings.fasterid_id_property] = new
             id_list.append(dic)
             old = new
