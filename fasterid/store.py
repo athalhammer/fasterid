@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+
+# Copyright (C) 2023  Andreas Thalhammer
+# Please get in touch if you plan to use this in a commercial setting.
+
 import os
 from abc import ABC, abstractmethod
 from sqlalchemy import Column, String, DateTime

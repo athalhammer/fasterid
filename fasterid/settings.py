@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+
+# Copyright (C) 2023  Andreas Thalhammer
+# Please get in touch if you plan to use this in a commercial setting.
+
 from enum import Enum
 from pydantic_settings import BaseSettings
 
@@ -22,4 +27,4 @@ class Settings(BaseSettings):
     fasterid_store_loc: str
 
     class Config:
-        env_file = "fasterid.env"
+        env_file = ".env"

@@ -2,6 +2,7 @@
 
 # Copyright (C) 2023  Andreas Thalhammer
 # Please get in touch if you plan to use this in a commercial setting.
+
 from .store import (
     LatestOnlyIdentifierStore,
     FullLogIdentifierStore,
