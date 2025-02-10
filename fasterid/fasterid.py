@@ -83,8 +83,7 @@ async def id_generator(
     id_list = []
     is_ld_json = "ld+json" in accept or settings.fasterid_always_rdf
     mime = "application/ld+json" if is_ld_json else "application/json"
-    ts_prop = settings.fasterid_ts_property if is_ld_json else "timestamp"
-
+    ts_prop = settings.fasterid_ts_property if is_ld_json else settings.fasterid_ts
     for _ in range(request.number):
         if old == settings.erdi8_start:
             raise HTTPException(500, detail="🤷 ran out of identifiers")

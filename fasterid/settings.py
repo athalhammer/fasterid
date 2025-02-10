@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     fasterid_id_property: str
     fasterid_ts_property: str
     fasterid_default_prefix: str
+    fasterid_ts: str
     fasterid_store_type: StorageType = StorageType.FILE_LOG
     fasterid_store_loc: str
 
