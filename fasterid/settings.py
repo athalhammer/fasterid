@@ -16,6 +16,7 @@ class StorageType(Enum):
 class Settings(BaseSettings):
     erdi8_stride: int
     erdi8_start: str
+    erdi8_stop: str
     erdi8_safe: bool
     fasterid_max_num: int
     fasterid_always_rdf: bool

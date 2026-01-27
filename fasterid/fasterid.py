@@ -76,28 +76,27 @@ async def id_generator(
     if request is None:
         request = RequestModel()
 
-    old = identifier_store.get_last_identifier()
-    if not old:
-        old = e8.increment_fancy(settings.erdi8_start, settings.erdi8_stride)
-
+    # this also implies that we skip the very first identifier if the store is empty
+    old = identifier_store.get_last_identifier() or settings.erdi8_start
     id_list = []
     is_ld_json = "ld+json" in accept or settings.fasterid_always_rdf
     mime = "application/ld+json" if is_ld_json else "application/json"
     ts_prop = settings.fasterid_ts_property if is_ld_json else settings.fasterid_ts
+
     for _ in range(request.number):
-        if old == settings.erdi8_start:
-            raise HTTPException(500, detail="🤷 ran out of identifiers")
-        try:
-            new = e8.increment_fancy(old, settings.erdi8_stride)
-            ts = datetime.utcnow()
-            dic = {"@id": f"{new}", ts_prop: ts.isoformat()}
-            if is_ld_json:
-                dic["@id"] = f"{request.prefix}{new}"
-                dic[settings.fasterid_id_property] = new
-            id_list.append(dic)
-            old = new
-        except Exception as e:
-            raise HTTPException(500, detail=getattr(e, "message", repr(e)))
+        next_id = e8.increment_fancy(old, settings.erdi8_stride)
+        if next_id == settings.erdi8_stop:
+            break
+        ts = datetime.now().astimezone()
+        dic = {"@id": f"{next_id}", ts_prop: ts.isoformat()}
+        if is_ld_json:
+            dic["@id"] = f"{request.prefix}{next_id}"
+            dic[settings.fasterid_id_property] = next_id
+        id_list.append(dic)
+        old = next_id
+
+    if not id_list:
+        raise HTTPException(500, detail="🤷 ran out of identifiers")
 
     for dic in id_list:
         identifier_store.store_identifier(
